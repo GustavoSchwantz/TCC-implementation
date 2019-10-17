@@ -4,68 +4,37 @@
 #include <gmp.h>
 
 #include "modular_arithmetic.h"
-
-// define um ponto da curva elíptica 
-struct Point { 
-    mpz_t x, y; 
-}; 
-
-// define uma curva elíptica
-struct Curve {
-	mpz_t a, b;
-    mpz_t p;
-};
-
-void point_init (struct Point *P);
-void curve_init (struct Curve *c);
-void point_clear (struct Point *P);
-void curve_clear (struct Curve *c);
-struct Point * addition (struct Point *P, struct Point *Q, struct Curve *c);
+#include "group_operation.h"
 
 int main (int argc, char const *argv[])
 {
-	mpz_t op1, op2, p, r;
+	struct Curve curve;
+	struct Point P, Q, R;
 
-	mpz_init (r);
-    
-    mpz_init_set_str (op1, "313", 10);
-	mpz_init_set_str (op2, "42", 10);
-	mpz_init_set_str (p, "17", 10);
+	curve_init (&curve);
+	point_init (&P);
+	point_init (&Q);
+	point_init (&R);
 
-	mod_div (op1, op2, r, p);
-    
-    gmp_printf ("%Zd\n", r);
+	mpz_set_str (curve.a, "2", 10);
+	mpz_set_str (curve.b, "2", 10);
+	mpz_set_str (curve.p, "17", 10);
 
-	mpz_clear (op1);
-	mpz_clear (op2);
-	mpz_clear (r);
-	mpz_clear (p);
+	mpz_set_str (P.x, "3", 10);
+	mpz_set_str (P.y, "6", 10);
+
+	mpz_set_str (Q.x, "5", 10);
+	mpz_set_str (Q.y, "1", 10);
+
+	point_doubling (&Q, &R, &curve);
+
+	gmp_printf ("x3 = %Zd\n", R.x);
+	gmp_printf ("y3 = %Zd\n", R.y);
+
+	curve_clear (&curve);
+	point_clear (&P);
+	point_clear (&Q);
+	point_clear (&R);
 
 	return 0;
-}
-
-void point_init (struct Point *P)
-{
-	mpz_init (P->x);
-	mpz_init (P->y);
-}
-
-void curve_init (struct Curve *c)
-{
-	mpz_init (c->a);
-	mpz_init (c->b);
-	mpz_init (c->p);
-}
-
-void point_clear (struct Point *P)
-{
-	mpz_clear (P->x);
-	mpz_clear (P->y);
-}
-
-void curve_clear (struct Curve *c)
-{
-	mpz_clear (c->a);
-	mpz_clear (c->b);
-	mpz_clear (c->p);
 }
