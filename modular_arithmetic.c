@@ -1,52 +1,52 @@
 #include <gmp.h>
 
-void mod_add (mpz_t a, mpz_t b, mpz_t c, mpz_t n)
+void mod_add (mpz_t r, const mpz_t op1, const mpz_t op2, const mpz_t n)
 {
 	mpz_t temp;
 
 	mpz_init (temp);
 
-	mpz_add (temp, a, b);
-	mpz_mod (c, temp, n);
+	mpz_add (temp, op1, op2);
+	mpz_mod (r, temp, n);
 
 	mpz_clear (temp);
 }
 
-void mod_sub (mpz_t a, mpz_t b, mpz_t c, mpz_t n)
+void mod_sub (mpz_t r, const mpz_t op1, const mpz_t op2, const mpz_t n)
 {
 	mpz_t temp;
 
 	mpz_init (temp);
 
-	mpz_sub (temp, a, b);
-	mpz_mod (c, temp, n);
+	mpz_sub (temp, op1, op2);
+	mpz_mod (r, temp, n);
 
 	mpz_clear (temp);
 }
 
-void mod_mul (mpz_t a, mpz_t b, mpz_t c, mpz_t n)
+void mod_mul (mpz_t r, const mpz_t op1, const mpz_t op2, const mpz_t n)
 {
 	mpz_t temp;
 
 	mpz_init (temp);
 
-	mpz_mul (temp, a, b);
-	mpz_mod (c, temp, n);
+	mpz_mul (temp, op1, op2);
+	mpz_mod (r, temp, n);
 
 	mpz_clear (temp);
 }
 
-void mod_div (mpz_t a, mpz_t b, mpz_t c, mpz_t n)
+void mod_div (mpz_t r, const mpz_t op1, const mpz_t op2, const mpz_t n)
 {
-	mpz_t temp1, temp2;
+	mpz_t op2_inv, temp;
 
-	mpz_init (temp1);
-	mpz_init (temp2);
+	mpz_init (op2_inv);
+	mpz_init (temp);
+    
+    mpz_invert (op2_inv, op2, n);
+	mpz_mul (temp, op1, op2_inv);
+	mpz_mod (r, temp, n);
 
-    mpz_invert (temp1, b, n);
-	mpz_mul (temp2, a, temp1);
-	mpz_mod (c, temp2, n);
-
-	mpz_clear (temp1);
-	mpz_clear (temp2);
+	mpz_clear (op2_inv);
+	mpz_clear (temp);
 }
