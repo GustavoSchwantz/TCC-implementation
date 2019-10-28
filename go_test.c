@@ -23,13 +23,24 @@ int main (int argc, char const *argv[])
 	mpz_set_str (P.x, "5", 10);
 	mpz_set_str (P.y, "1", 10);
 
-	mpz_set_str (Q.x, "5", 10);
-	mpz_set_str (Q.y, "2", 10);
+	mpz_set_str (Q.x, "16", 10);
+	mpz_set_str (Q.y, "13", 10);
 
-	point_doubling (&P, P, curve);
+	point_doubling (&R, P, curve);
 
-	gmp_printf ("x3 = %Zd\n", P.x);
-	gmp_printf ("y3 = %Zd\n", P.y);
+	//gmp_printf ("x1 = %Zd\n", P.x);
+	//gmp_printf ("y1 = %Zd\n", P.y);
+	gmp_printf ("x3 = %Zd\n", R.x);
+	gmp_printf ("y3 = %Zd\n", R.y);
+
+	int i;
+
+	for (i = 0; i < 17; ++i) {
+        point_addition (&R, P, R, curve);
+
+		gmp_printf ("x3 = %Zd\n", R.x);
+	    gmp_printf ("y3 = %Zd\n", R.y);
+	}
 
 	curve_clear (&curve);
 	point_clear (&P);
