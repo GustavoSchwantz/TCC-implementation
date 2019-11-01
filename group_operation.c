@@ -66,3 +66,10 @@ void point_doubling (struct Point *R, const struct Point P, const struct Curve c
     mpz_clear (x3); mpz_clear (y3);
 }
 
+void point_operation (struct Point *R, const struct Point P, const struct Point Q, const struct Curve c)
+{
+	if ( ( mpz_cmp (P.x, Q.x) == 0 ) && ( mpz_cmp (P.y, Q.y) == 0 ) )
+		point_doubling (R, P, c);
+	else
+		point_addition (R, P, Q, c);
+}

@@ -12,14 +12,9 @@ void double_and_add (struct Point *T, const struct Point P, mpz_t d, const struc
     int i;
 
     for (i = (mpz_sizeinbase (d, 2) - 2) ; i >= 0 ; --i) {
-        point_doubling (T, *T, c);
+        point_operation (T, *T, *T, c);
 
-        gmp_printf ("doubling: (%Zd, %Zd)\n", T->x, T->y);
-
-        if (mpz_tstbit (d, i) == 1) {
-            point_addition (T, *T, P, c);
-            gmp_printf ("P: (%Zd, %Zd)\n", P.x, P.y);
-            gmp_printf ("addition: (%Zd, %Zd)\n", T->x, T->y);
-        }
+        if (mpz_tstbit (d, i) == 1) 
+            point_operation (T, P, *T, c);
     }
 }
