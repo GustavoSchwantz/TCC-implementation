@@ -29,25 +29,25 @@ int main(int argc, char const *argv[])
 {
 	struct Curve c;
 	struct Point P, Q;
-	mpz_t d, n;
+	mpz_t d, n, a, b;
 
 	curve_init (&c); 
  	point_init (&P);  
 	point_init (&Q); 
 	mpz_init (d);
-	mpz_init (n);  
+	mpz_init (n);
     
-	mpz_set_str (c.a, "1", 10);
-	mpz_set_str (c.b, "44", 10);
-	mpz_set_str (c.p, "229", 10);
+	mpz_set_str (c.a, "2", 10);
+	mpz_set_str (c.b, "2", 10);
+	mpz_set_str (c.p, "17", 10);
     
 	mpz_set_str (P.x, "5", 10);
-	mpz_set_str (P.y, "116", 10);
+	mpz_set_str (P.y, "1", 10);
 
-	mpz_set_str (n, "239", 10);
+	mpz_set_str (n, "19", 10);
 
-	mpz_set_str (Q.x, "155", 10);
-	mpz_set_str (Q.y, "166", 10);
+	mpz_set_str (Q.x, "16", 10);
+	mpz_set_str (Q.y, "13", 10);
 
 	rho_of_pollard (d, P, Q, n, c);
 
@@ -81,7 +81,7 @@ void table_init (struct Triple t[L])
 	int i;
     
     for (i = 0; i < L; ++i)
-    	triple_init (t);
+    	triple_init (&t[i]);
 }
 
 void table_clear (struct Triple t[L])
@@ -89,12 +89,12 @@ void table_clear (struct Triple t[L])
 	int i;
     
     for (i = 0; i < L; ++i)
-    	triple_clear (t);
+    	triple_clear (&t[i]);
 }
 
 int H (const struct Point P)
 {
-	return mpz_fdiv_ui (P.x, L) + 1;
+	return mpz_fdiv_ui (P.x, L);
 }
 
 void set_random (mpz_t a, mpz_t b, const mpz_t n)
@@ -141,15 +141,44 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
 	mpz_init (c1); mpz_init (c2); mpz_init (d1); mpz_init (d2);
 	mpz_init (temp1); mpz_init (temp2); mpz_init (temp3);
 
-	for (j = 1; j <= L; ++j) {
+	for (j = 0; j < L; ++j) {
 		set_random (table[j].a, table[j].b, n);
         mul_and_add (&(table[j].P), table[j].a, table[j].b, P, Q, c);
 	}
 
+	//mpz_set_str (table[0].a, "79", 10);
+	//mpz_set_str (table[0].b, "163", 10);
+	//mpz_set_str (table[0].P.x, "135", 10);
+	//mpz_set_str (table[0].P.y, "117", 10);
+	//mpz_set_str (table[1].a, "206", 10);
+	//mpz_set_str (table[1].b, "19", 10);
+	//mpz_set_str (table[1].P.x, "96", 10);
+	//mpz_set_str (table[1].P.y, "97", 10);
+	//mpz_set_str (table[2].a, "87", 10);
+	//mpz_set_str (table[2].b, "109", 10);
+	//mpz_set_str (table[2].P.x, "84", 10);
+	//mpz_set_str (table[2].P.y, "62", 10);
+	//mpz_set_str (table[3].a, "219", 10);
+	//mpz_set_str (table[3].b, "68", 10);
+	//mpz_set_str (table[3].P.x, "72", 10);
+	//mpz_set_str (table[3].P.y, "134", 10);
+
     set_random (c1, d1, n);
+    //mpz_set_str (c1, "54", 10);
+	//mpz_set_str (d1, "175", 10);
     mul_and_add (&X1, c1, d1, P, Q, c);
 
+    //gmp_printf ("c1 = %Zd ", c1);
+    //gmp_printf ("d1 = %Zd ", d1);
+    //gmp_printf ("X1 = (%Zd, %Zd) ", X1.x, X1.y);
+
     mpz_set (X2.x, X1.x); mpz_set (X2.y, X1.y); mpz_set (c2, c1); mpz_set (d2, d1);
+
+    //gmp_printf ("c2 = %Zd ", c2);
+    //gmp_printf ("d2 = %Zd ", d2);
+    //gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
+    
+    //int x = 1;
 
     do {
 
@@ -166,7 +195,21 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
     	    mod_add (c2, c2, table[j].a, n);
     	    mod_add (d2, d2, table[j].b, n);
     	}
+        
+        //printf("i = %d ", x++);
+
+        //gmp_printf ("c1 = %Zd ", c1);
+        //gmp_printf ("d1 = %Zd ", d1);
+        //gmp_printf ("X1 = (%Zd, %Zd) ", X1.x, X1.y);
+
+        //gmp_printf ("c2 = %Zd ", c2);
+        //gmp_printf ("d2 = %Zd ", d2);
+        //gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
+
     } while ( !(mpz_cmp (X1.x, X2.x) == 0 && mpz_cmp (X1.y, X2.y) == 0) );
+
+    // gmp_printf ("X1 = (%Zd, %Zd)\n", X1.x, X1.y);
+    // gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
     
     if ( (mpz_cmp (d1, d2) == 0 ) )
     	printf("failure\n");
