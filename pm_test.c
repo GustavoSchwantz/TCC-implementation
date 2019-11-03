@@ -11,9 +11,11 @@ int main (int argc, char const *argv[])
 {
     struct Curve c1;
 	struct Point P, T, R;
-	mpz_t d;
+	mpz_t d, n;
 
-	curve_init (&c1); 
+	mpz_init_set_str (n, "6277101735386680763835789423176059013767194773182842284081", 10);
+
+	curve_init (&c1, n); 
  	point_init (&P);  // ponto gerador
 	point_init (&R);  // irá guardar resultado
 	point_init (&T);  // resultado esperado
@@ -76,6 +78,7 @@ int main (int argc, char const *argv[])
 	point_clear (&R);
 	point_clear (&T); 
 	mpz_clear (d);
+	mpz_clear (n);
 
 	return 0;
 }

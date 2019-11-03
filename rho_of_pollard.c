@@ -46,8 +46,8 @@ int main(int argc, char const *argv[])
 
 	mpz_set_str (n, "19", 10);
 
-	mpz_set_str (Q.x, "16", 10);
-	mpz_set_str (Q.y, "13", 10);
+	mpz_set_str (Q.x, "5", 10);
+	mpz_set_str (Q.y, "16", 10);
 
 	rho_of_pollard (d, P, Q, n, c);
 
@@ -144,6 +144,9 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
 	for (j = 0; j < L; ++j) {
 		set_random (table[j].a, table[j].b, n);
         mul_and_add (&(table[j].P), table[j].a, table[j].b, P, Q, c);
+        gmp_printf ("aj = %Zd ", table[j].a);
+        gmp_printf ("bj = %Zd ", table[j].b);
+        gmp_printf ("Rj = (%Zd, %Zd)\n\n", table[j].P.x, table[j].P.y);
 	}
 
 	//mpz_set_str (table[0].a, "79", 10);
@@ -168,17 +171,17 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
 	//mpz_set_str (d1, "175", 10);
     mul_and_add (&X1, c1, d1, P, Q, c);
 
-    //gmp_printf ("c1 = %Zd ", c1);
-    //gmp_printf ("d1 = %Zd ", d1);
-    //gmp_printf ("X1 = (%Zd, %Zd) ", X1.x, X1.y);
+    gmp_printf ("c1 = %Zd ", c1);
+    gmp_printf ("d1 = %Zd ", d1);
+    gmp_printf ("X1 = (%Zd, %Zd) ", X1.x, X1.y);
 
     mpz_set (X2.x, X1.x); mpz_set (X2.y, X1.y); mpz_set (c2, c1); mpz_set (d2, d1);
 
-    //gmp_printf ("c2 = %Zd ", c2);
-    //gmp_printf ("d2 = %Zd ", d2);
-    //gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
+    gmp_printf ("c2 = %Zd ", c2);
+    gmp_printf ("d2 = %Zd ", d2);
+    gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
     
-    //int x = 1;
+    int x = 1;
 
     do {
 
@@ -188,23 +191,35 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
     	mod_add (c1, c1, table[j].a, n);
     	mod_add (d1, d1, table[j].b, n);
 
+    	printf("x = %d ", x++);
+
+        gmp_printf ("c1 = %Zd ", c1);
+        gmp_printf ("d1 = %Zd ", d1);
+        gmp_printf ("X1 = (%Zd, %Zd)\n", X1.x, X1.y);
+
     	for (i = 0; i < 2; ++i) {
     		j = H (X2); 
 
     	    point_operation (&X2, X2, table[j].P, c);
     	    mod_add (c2, c2, table[j].a, n);
     	    mod_add (d2, d2, table[j].b, n);
+
+    	    printf("i = %d ", i);
+
+            gmp_printf ("c2 = %Zd ", c2);
+            gmp_printf ("d2 = %Zd ", d2);
+            gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
     	}
         
-        //printf("i = %d ", x++);
+        // printf("x = %d ", x++);
 
-        //gmp_printf ("c1 = %Zd ", c1);
-        //gmp_printf ("d1 = %Zd ", d1);
-        //gmp_printf ("X1 = (%Zd, %Zd) ", X1.x, X1.y);
+        // gmp_printf ("c1 = %Zd ", c1);
+        // gmp_printf ("d1 = %Zd ", d1);
+        // gmp_printf ("X1 = (%Zd, %Zd) ", X1.x, X1.y);
 
-        //gmp_printf ("c2 = %Zd ", c2);
-        //gmp_printf ("d2 = %Zd ", d2);
-        //gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
+        // gmp_printf ("c2 = %Zd ", c2);
+        // gmp_printf ("d2 = %Zd ", d2);
+        // gmp_printf ("X2 = (%Zd, %Zd)\n", X2.x, X2.y);
 
     } while ( !(mpz_cmp (X1.x, X2.x) == 0 && mpz_cmp (X1.y, X2.y) == 0) );
 

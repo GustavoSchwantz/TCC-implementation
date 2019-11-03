@@ -1,69 +1,125 @@
 #include <gmp.h>
+#include <stdio.h>
 #include "curve.h"
 #include "modular_arithmetic.h"
 
 void point_addition (struct Point *R, const struct Point P, const struct Point Q, const struct Curve c)
 {
-    mpz_t temp1, temp2, temp3, s;
-    mpz_t x3, y3;
+    if ( mpz_cmp (P.k, c.n) == 0 && mpz_cmp (Q.k, c.n) != 0 ) {
+    	mpz_set (R->x, Q.x);
+	    mpz_set (R->y, Q.y);
+	    mpz_set (R->k, Q.k);
+	}
 
-    mpz_init (temp1); mpz_init (temp2); mpz_init (temp3); mpz_init (s);
-    mpz_init (x3); mpz_init (y3);
+	else if ( mpz_cmp (P.k, c.n) != 0 && mpz_cmp (Q.k, c.n) == 0 ) {
+    	mpz_set (R->x, P.x);
+	    mpz_set (R->y, P.y);
+	    mpz_set (R->k, P.k);
+	}
+ 
+    else if ( 
+    	( mpz_cmp (P.k, c.n) == 0 )
+           && ( mpz_cmp (Q.k, c.n) == 0 ) 
+           ) {
+    	mpz_set_str (R->x, "0", 10);
+	    mpz_set_str (R->y, "0", 10);
+	    mpz_set (R->k, c.n);
+	}
 
-	// s = (y2 - y1)/(x2 - x1) mod p
-	mpz_sub (temp1, Q.y, P.y);
-	mpz_sub (temp2, Q.x, P.x);
-	mod_div (s, temp1, temp2, c.p);
+	else {
+		mpz_t aux;
 
-	// x3 = s^2 - x1 - x2 mod p
-	mpz_pow_ui (temp1, s, 2);
-	mpz_sub (temp2, temp1, P.x);
-	mod_sub (x3, temp2, Q.x, c.p);
+        mpz_init (aux);
 
-	// y3 = s*(x1 - x3) - y1 mod p
-	mpz_sub (temp1, P.x, x3);
-	mpz_mul (temp2, s, temp1);
-	mod_sub (y3, temp2, P.y, c.p);
+        mod_add (aux, P.k, Q.k, c.n);
 
-	mpz_set (R->x, x3);
-	mpz_set (R->y, y3);
+        if ( mpz_cmp_si (aux, 0) == 0 ) {
+    	    mpz_set_str (R->x, "0", 10);
+	        mpz_set_str (R->y, "0", 10);
+	        mpz_set (R->k, c.n);
+        }
 
-    mpz_clear (temp1); mpz_clear (temp2); mpz_clear (temp3); mpz_clear (s);
-    mpz_clear (x3); mpz_clear (y3);
+        else {
+    	    mpz_t temp1, temp2, temp3, s;
+            mpz_t x3, y3;
+
+            mpz_init (temp1); mpz_init (temp2); mpz_init (temp3); mpz_init (s);
+            mpz_init (x3); mpz_init (y3); 
+
+	        // s = (y2 - y1)/(x2 - x1) mod p
+	        mpz_sub (temp1, Q.y, P.y);
+	        mpz_sub (temp2, Q.x, P.x);
+	        mod_div (s, temp1, temp2, c.p);
+
+	        // x3 = s^2 - x1 - x2 mod p
+	        mpz_pow_ui (temp1, s, 2);
+	        mpz_sub (temp2, temp1, P.x);
+	        mod_sub (x3, temp2, Q.x, c.p);
+
+	        // y3 = s*(x1 - x3) - y1 mod p
+	        mpz_sub (temp1, P.x, x3);
+	        mpz_mul (temp2, s, temp1);
+	        mod_sub (y3, temp2, P.y, c.p);
+
+	        mpz_set (R->x, x3);
+	        mpz_set (R->y, y3);
+	        mpz_set (R->k, aux);
+
+            mpz_clear (temp1); mpz_clear (temp2); mpz_clear (temp3); mpz_clear (s);
+            mpz_clear (x3); mpz_clear (y3);
+        }
+
+        mpz_clear (aux);
+	}
 }
 
 void point_doubling (struct Point *R, const struct Point P, const struct Curve c)
 {
-	mpz_t temp1, temp2, temp3, s;
-	mpz_t x3, y3;
+    mpz_t aux;
 
-    mpz_init (temp1); mpz_init (temp2); mpz_init (temp3); mpz_init (s);
-    mpz_init (x3); mpz_init (y3);
+    mpz_init (aux);
 
-	// s = (3*x1^2 + a)/2*y1 mod p
-	mpz_pow_ui (temp1, P.x, 2);
-	mpz_mul_ui (temp2, temp1, 3);
-    mpz_add (temp3, temp2, c.a);
-    mpz_mul_ui (temp1, P.y, 2);
-    mod_div (s, temp3, temp1, c.p);
+    mod_add (aux, P.k, P.k, c.n);
 
-	// x3 = s^2 - x1 - x2 mod p
-	mpz_pow_ui (temp1, s, 2);
-	mpz_sub (temp2, temp1, P.x);
-	// gmp_printf ("x1 = %Zd\n", P.x);
-	mod_sub (x3, temp2, P.x, c.p);
+    if ( mpz_cmp_si (aux, 0) == 0 ) {
+    	mpz_set_str (R->x, "0", 10);
+	    mpz_set_str (R->y, "0", 10);
+	    mpz_set (R->k, c.n);
+    }
 
-	// y3 = s*(x1 - x3) - y1 mod p
-	mpz_sub (temp1, P.x, x3);
-	// gmp_printf ("x1 = %Zd\n", P.x);
-	mpz_mul (temp2, s, temp1);
-	mod_sub (y3, temp2, P.y, c.p);
+    else {
+    	mpz_t temp1, temp2, temp3, s;
+	    mpz_t x3, y3;
 
-	mpz_set (R->x, x3);
-	mpz_set (R->y, y3);
+        mpz_init (temp1); mpz_init (temp2); mpz_init (temp3); mpz_init (s);
+        mpz_init (x3); mpz_init (y3);
 
-    mpz_clear (temp1); mpz_clear (temp2); mpz_clear (temp3); mpz_clear (s); 
-    mpz_clear (x3); mpz_clear (y3);
+	    // s = (3*x1^2 + a)/2*y1 mod p
+	    mpz_pow_ui (temp1, P.x, 2);
+	    mpz_mul_ui (temp2, temp1, 3);
+        mpz_add (temp3, temp2, c.a);
+        mpz_mul_ui (temp1, P.y, 2);
+        mod_div (s, temp3, temp1, c.p);
+
+	    // x3 = s^2 - x1 - x2 mod p
+	    mpz_pow_ui (temp1, s, 2);
+	    mpz_sub (temp2, temp1, P.x);
+	    // gmp_printf ("x1 = %Zd\n", P.x);
+	    mod_sub (x3, temp2, P.x, c.p);
+
+	    // y3 = s*(x1 - x3) - y1 mod p
+	    mpz_sub (temp1, P.x, x3);
+	    // gmp_printf ("x1 = %Zd\n", P.x);
+	    mpz_mul (temp2, s, temp1);
+	    mod_sub (y3, temp2, P.y, c.p);
+
+	    mpz_set (R->x, x3);
+	    mpz_set (R->y, y3);
+	    mpz_set (R->k, aux);
+
+        mpz_clear (temp1); mpz_clear (temp2); mpz_clear (temp3); mpz_clear (s); 
+        mpz_clear (x3); mpz_clear (y3);
+    }
 }
 
 void point_operation (struct Point *R, const struct Point P, const struct Point Q, const struct Curve c)
