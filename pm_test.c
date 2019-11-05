@@ -20,6 +20,54 @@ int main (int argc, char const *argv[])
 	point_init (&R);  // irá guardar resultado
 	point_init (&T);  // resultado esperado
 	mpz_init (d);     // secret key
+
+	/*mpz_set_str (c1.a, "2", 10);
+	mpz_set_str (c1.b, "2", 10);
+	mpz_set_str (c1.p, "17", 10);
+    
+	mpz_set_str (P.x, "5", 10);
+	mpz_set_str (P.y, "1", 10);
+    
+    mpz_set_str (d, "1", 10); // setando um valor para a secret key: d = 1
+    
+	mpz_set_str (T.x, "5", 10);
+	mpz_set_str (T.y, "1", 10);
+
+	double_and_add (&R, P, d, c1);
+
+	points_are_equal (T, R);
+
+	mpz_set_str (d, "18", 10); // setando d =  n - 1
+    
+	mpz_set_str (T.x, "5", 10);
+	mpz_set_str (T.y, "16", 10);
+
+	double_and_add (&R, P, d, c1);
+
+	points_are_equal (T, R);
+
+	mpz_set_str (d, "6", 10); // setando d para um valor arbitrario
+    
+	mpz_set_str (T.x, "16", 10);
+	mpz_set_str (T.y, "13", 10);
+
+	//gmp_printf ("P = (%Zd, %Zd), k = %Zd\n", P.x, P.y, P.k);
+
+	double_and_add (&R, P, d, c1);
+
+	points_are_equal (T, R);
+
+	mpz_set_str (d, "19", 10); // setando d = n
+    
+	mpz_set_str (T.x, "0", 10);
+	mpz_set_str (T.y, "0", 10);
+
+	double_and_add (&R, P, d, c1);
+
+	// gmp_printf ("R = (%Zd, %Zd), k = %Zd\n", R.x, R.y, R.k);
+
+	points_are_equal (T, R);*/
+    
     
     // curva P-192 do NIST
 	mpz_set_str (c1.a, "-3", 10);
@@ -29,6 +77,7 @@ int main (int argc, char const *argv[])
     // ponto gerador dado junto com a curva P-192 do NIST
 	mpz_set_str (P.x, "188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012", 16);
 	mpz_set_str (P.y, "07192b95ffc8da78631011ed6b24cdd573f977a11e794811", 16);
+	//mpz_set_str (P.k, "1", 10);
     
     mpz_set_str (d, "1", 10); // setando um valor para a secret key: d = 1
     
@@ -69,9 +118,6 @@ int main (int argc, char const *argv[])
 	double_and_add (&R, P, d, c1);
 
 	points_are_equal (T, R);
-
-	// gmp_printf ("x = %Zd\n", R.x);
-	// gmp_printf ("y = %Zd\n", R.y);
 
 	curve_clear (&c1);
 	point_clear (&P);
