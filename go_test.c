@@ -9,12 +9,16 @@
 int main (int argc, char const *argv[])
 {
 	struct Curve curve;
-	struct Point P, Q, R;
+	struct Point P, Q, R, O;
+	mpz_t n;
 
-	curve_init (&curve);
+	mpz_init_set_str (n, "19", 10);
+
+	curve_init (&curve, n);
 	point_init (&P);
 	point_init (&Q);
 	point_init (&R);
+	point_init (&O);
 
 	mpz_set_str (curve.a, "2", 10);
 	mpz_set_str (curve.b, "2", 10);
@@ -23,29 +27,34 @@ int main (int argc, char const *argv[])
 	mpz_set_str (P.x, "5", 10);
 	mpz_set_str (P.y, "1", 10);
 
-	mpz_set_str (Q.x, "16", 10);
-	mpz_set_str (Q.y, "13", 10);
+	mpz_set_str (Q.x, "5", 10);
+	mpz_set_str (Q.y, "16", 10);
+	mpz_set_str (Q.k, "18", 10);
 
-	point_doubling (&R, P, curve);
+	mpz_set_str (O.x, "0", 10);
+	mpz_set_str (O.y, "0", 10);
+	mpz_set_str (O.k, "19", 10);
+
+	point_operation (&R, P, P, curve);
 
 	//gmp_printf ("x1 = %Zd\n", P.x);
 	//gmp_printf ("y1 = %Zd\n", P.y);
-	gmp_printf ("x3 = %Zd\n", R.x);
-	gmp_printf ("y3 = %Zd\n", R.y);
+	gmp_printf ("R = (%Zd, %Zd), k = %Zd\n", R.x, R.y, R.k);
 
 	int i;
 
-	for (i = 0; i < 17; ++i) {
-        point_addition (&R, P, R, curve);
+	for (i = 0; i < 50; ++i) {
+        point_operation (&R, R, P, curve);
 
-		gmp_printf ("x3 = %Zd\n", R.x);
-	    gmp_printf ("y3 = %Zd\n", R.y);
+		gmp_printf ("R = (%Zd, %Zd), k = %Zd\n", R.x, R.y, R.k);
 	}
 
 	curve_clear (&curve);
 	point_clear (&P);
 	point_clear (&Q); 
 	point_clear (&R);
+	point_clear (&O);
+	mpz_clear (n);
 
 	return 0;
 }
