@@ -10,7 +10,7 @@
 #include "point_multiplication.h"
 #include "group_operation.h"
 
-#define L 4
+#define L 32
 
 struct Triple {
 	mpz_t a, b;
@@ -33,8 +33,10 @@ int main(int argc, char const *argv[])
 	struct Curve c;
 	struct Point P, Q, R;
 	mpz_t d, n;
+	clock_t start, end;
+    double cpu_time_used;
 
-	mpz_init_set_str (n, "239", 10);
+	mpz_init_set_str (n, "453913054741", 10);
 
 	curve_init (&c, n); 
  	point_init (&P);  
@@ -42,20 +44,27 @@ int main(int argc, char const *argv[])
 	point_init (&R);
 	mpz_init (d);
     
-	mpz_set_str (c.a, "1", 10);
-	mpz_set_str (c.b, "44", 10);
-	mpz_set_str (c.p, "229", 10);
+	mpz_set_str (c.a, "367209891968", 10);
+	mpz_set_str (c.b, "221329653569", 10);
+	mpz_set_str (c.p, "453911875139", 10);
     
-	mpz_set_str (P.x, "5", 10);
-	mpz_set_str (P.y, "116", 10);
+	mpz_set_str (P.x, "104111392764", 10);
+	mpz_set_str (P.y, "175255528532", 10);
 
-	mpz_set_str (Q.x, "155", 10);
-	mpz_set_str (Q.y, "166", 10);
-	mpz_set_str (Q.k, "176", 10);
+	mpz_set_str (Q.x, "98208314261", 10);
+	mpz_set_str (Q.y, "123775881662", 10);
+	mpz_set_str (Q.k, "149550786019", 10);
+    
+    start = clock();
 
 	rho_of_pollard (d, P, Q, n, c);
 
+	end = clock();
+
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    
 	gmp_printf ("d = %Zd\n", d);
+	printf("Tempo para o cálculo de d: %f segundos\n", cpu_time_used);
 
 	curve_clear (&c);
 	point_clear (&P);
@@ -154,12 +163,16 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
 	int i, j;
 	mpz_t c1, c2, d1, d2;
 	mpz_t temp1, temp2, temp3;
+	mpz_t x;
 
 	point_init (&X1);
 	point_init (&X2);
 	table_init (table);
 	mpz_init (c1); mpz_init (c2); mpz_init (d1); mpz_init (d2);
 	mpz_init (temp1); mpz_init (temp2); mpz_init (temp3);
+	mpz_init (x);
+
+	printf("Iniciando...\n");
 
 	for (j = 0; j < L; ++j) {
 		set_random (table[j].a, table[j].b, n);
@@ -173,6 +186,9 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
     mpz_set (c2, c1); mpz_set (d2, d1);
 
     do {
+
+    	gmp_printf ("Iteração %Zd\n", x);
+    	mpz_add_ui (x, x, 1);
 
     	j = H (X1); 
 
@@ -199,9 +215,12 @@ void rho_of_pollard (mpz_t d, const struct Point P, const struct Point Q,
         mod_mul (d, temp1, temp3, n);
     }	
 
+    printf("Fim!\n");
+
 	point_clear (&X1);
 	point_clear (&X2);
 	table_clear (table);
 	mpz_clear (c1); mpz_clear (c2); mpz_clear (d1); mpz_clear (d2);
 	mpz_clear (temp1); mpz_clear (temp2); mpz_clear (temp3);
+	mpz_clear (x);
 } 
